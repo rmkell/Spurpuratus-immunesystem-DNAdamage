@@ -6,7 +6,7 @@
   * Genome: S. purpuratus v5.0 (https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000002235.5/)
   * Script: cellranger_mkref.sh
 
-# 2. Count reads using cellranger count using 10x Cloud Analysis
+# 2. Count reads using cellranger 'count' in 10x Cloud Analysis platform
   * Complete 10X tutorial here: https://www.10xgenomics.com/support/software/cell-ranger/latest/tutorials/cr-tutorial-ct
   * This was run on each sample individually
   * Program: cellranger v7.1.0
