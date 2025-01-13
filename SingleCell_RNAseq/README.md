@@ -7,7 +7,7 @@
   * Script: cellranger_mkref.sh
 
 # 2. Count reads using cellranger count
-  * Complete 10X tutorial here: https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-gex-count
+  * Complete 10X tutorial here: https://www.10xgenomics.com/support/software/cell-ranger/latest/tutorials/cr-tutorial-ct
   * This was run on each sample individually
   * Program: cellranger-6.1.2
   * --expect cells = 10,000
