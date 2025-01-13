@@ -18,6 +18,6 @@
   * Program: cellbender v.0.3.0 (https://github.com/broadinstitute/CellBender)
   * Script: run_cellbender.sh
 
-# 4. Clustering and Differential Expression analysis
-  * Programs: SCVI tools, Scanpy
+# 4. Clustering and Differential Expression analysis in Python
+  * Programs: SCVI tools v1.1.2 (https://scvi-tools.org/), Scanpy v1.10.1 (https://scanpy.readthedocs.io/en/stable/)
   * Script:
