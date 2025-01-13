@@ -2,20 +2,21 @@
 
 # 1. Convert *S. purpuratus* genome into a cellranger reference
   * Complete 10X tutorial here: https://www.10xgenomics.com/support/software/cell-ranger/latest/tutorials/cr-tutorial-mr
-  * Program: cellranger-6.1.2
+  * Program: cellranger v7.1.0
   * Genome: S. purpuratus v5.0 (https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000002235.5/)
   * Script: cellranger_mkref.sh
 
-# 2. Count reads using cellranger count
+# 2. Count reads using cellranger count using 10x Cloud Analysis
   * Complete 10X tutorial here: https://www.10xgenomics.com/support/software/cell-ranger/latest/tutorials/cr-tutorial-ct
   * This was run on each sample individually
-  * Program: cellranger-6.1.2
+  * Program: cellranger v7.1.0
   * --expect cells = 10,000
-  * Script: cellranger_count.sh
+  * 'Count' was performed using 10X Cloud Analysis.
+  * Output Feature / cell matrix HDF5 (raw) files were downloaded from the 10X Cloud Analysis project and used as CellBender input
 
 # 3. Remove background RNA using CellBender
-  * Program: cellbender
-  * Script:
+  * Program: cellbender v.0.3.0 (https://github.com/broadinstitute/CellBender)
+  * Script: run_cellbender.sh
 
 # 4. Clustering and Differential Expression analysis
   * Programs: SCVI tools, Scanpy
