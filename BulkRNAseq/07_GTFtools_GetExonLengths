@@ -1,0 +1,36 @@
+#Using GTFtools to get exon lengths from the S.purpuratus .GTF
+#1/30/25 RMK
+#Necessary for downstream creation of length-normalized TPM analysis in bulk RNAseq.
+#https://github.com/RacconC/gtftools/blob/master/README.md
+#See the "-l" option: Calculate gene lengths. Since a gene may have multiple isoforms, there are multiple ways to calculate gene length based on literature. Three simple ways are considering the mean, median and maximum of the lengths of isoforms as the length of the gene. A fourth way is to calculate the length of merged exons of all isoforms (i.e. non-overlapping exonic length). So, in total, four different types of gene lengths(the mean, median and max of lengths of isoforms of agene, and the length of merged exons of isoforms of a gene) are provided. format.
+#Example use:
+#gtftools -l gene_length.txt demo.gtf
+
+!conda config --add channels bioconda
+!conda config --add channels conda-forge
+!conda install -y gtftools
+
+#Verify installation
+!gtftools --version
+
+#Process GTF to remove commented-out lines, and rename all chromosome names in column one to just "1"
+def process_gtf(input_file, output_file):
+    with open(input_file, 'r') as infile, open(output_file, 'w') as outfile:
+        for line in infile:
+            # Skip commented lines
+            if line.startswith('#'):
+                continue
+            # Replace chromosome names with "1"
+            parts = line.split('\t')
+            parts[0] = '1'
+            outfile.write('\t'.join(parts) + '\n')
+
+# Process the GTF file
+input_gtf = 'GCF_000002235.5_Spur_5.0_genomic.gtf'
+output_gtf = 'SpurGTF_PROCESSED.gtf'
+process_gtf(input_gtf, output_gtf)
+
+print(f"Processed GTF file saved as {output_gtf}")
+
+#Run GTFtools command
+!gtftools -l Spurgene_length.txt SpurGTF_PROCESSED.gtf
