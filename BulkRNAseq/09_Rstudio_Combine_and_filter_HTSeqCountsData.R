@@ -1,18 +1,9 @@
 #HTSEQ Counts Data from S.purpuratus UVB bulkRNAseq experiment: manipulate counts files.
 #Updated 1/31/25 by RMK
-#HTSEQ was performed using the GMGI RHEL server. Output .counts files were downloaded to desktop.
+#HTSEQ was performed perviously using the GMGI RHEL server. Output .counts files are used as input here.
 #Each counts file was opened manually, and the last 4 lines were deleted, and the file was resaved.
 
 #This R script is simply to read in each .counts file as a dataframe, name the columns, and then merge everything together. 
-
-# Read the counts data into a dataframe
-#Control_0hr_A <- data.frame(read.table("SP1_C0_S29.combined.counts", sep=" "))
-# Rename the columns
-#colnames(Control_0hr_A) <- c("target_id", "Control_0hr_A_count")
-# Verify the column names
-#print(colnames(Control_0hr_A))
-
-#Rather than do the above 29 times, use the loop below to read in all 29 files and rename.
 
 # Define a function to generate the new dataframe name based on the file name
 generate_df_name <- function(file_name) {
@@ -82,7 +73,7 @@ transposed_counts <- t(filtered_counts)
 #Convert back to dataframe
 test <- as.data.frame(transposed_counts)
 write.table(test, "TimecourseRNA_noZeros_Transposed.tsv", sep = "\t", quote =FALSE)
-#Also write file without row names for TPM pipeline
+#Also write file without row names for downstream analysis pipeline
 write.table(test, "TimecourseRNA_noZeros_Transpose_noRowNames.csv", row.names = FALSE, col.names= FALSE, sep = ",", quote = FALSE)
 
 
@@ -113,3 +104,4 @@ write.table(test, "TimecourseRNA_noZeros_Transpose_noRowNames.csv", row.names = 
 
 
          
+
