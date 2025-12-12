@@ -1,4 +1,4 @@
-# Transcriptomic analysis of purple sea urchin (*Strongylocentrotus purpuratus*) immune system cells (coelomocytes): Response to DNA damage
+# Transcriptomic analysis of purple sea urchin (*Strongylocentrotus purpuratus*) immune system cells (coelomocytes) challenged with UVB radiation (10,000 mJ/cm2) to induce DNA damage
 Raw data for the single-cell and bulk RNA sequencing have been deposited in the National Center of Biotechnology Information (NCBI) under BioProject accession number PRJNA1346447 (Sequence Read Archive accession numbers SRR35853817 – SRR35853834). 
 
 # Single-cell RNA sequencing #
