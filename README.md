@@ -1,5 +1,5 @@
 # Transcriptomic analysis of sea urchin (S. purpuratus) immune system cells (coelomocytes): Response to DNA damage
-The raw single-cell RNA sequencing and bulk RNA sequencing data files associated with this project are affiliated with NCBI BioProject PRJNA#######
+Raw data for the single-cell and bulk RNA sequencing have been deposited in the National Center of Biotechnology Information (NCBI) under BioProject accession number PRJNA1346447 (Sequence Read Archive accession numbers SRR35853817 – SRR35853834). 
 
 # Single-cell RNA sequencing #
 * Single-cell RNA sequencing was performed on S. purpuratus coelomocytes harvested at 6hrs post-UVB dose.
