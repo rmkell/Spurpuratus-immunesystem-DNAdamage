@@ -1,4 +1,4 @@
-# *S. purpuratus* immune cell (coelomocyte) single-cell analysis
+# *S. purpuratus* immune cell (coelomocyte) single-cell analysis: comparison of n=3 UVB treated (1000 mJ/cm2) and n=3 control biological replicates
 
 # 1. Convert *S. purpuratus* genome into a cellranger reference
   * Complete 10X tutorial here: https://www.10xgenomics.com/support/software/cell-ranger/latest/tutorials/cr-tutorial-mr
