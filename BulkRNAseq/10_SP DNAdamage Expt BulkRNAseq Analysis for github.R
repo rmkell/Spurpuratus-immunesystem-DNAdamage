@@ -1,8 +1,8 @@
 #Analysis of timecourse bulk-RNAseq data comparing control and UVB treated (1000 mJ/cm2) S.purpuratus coelomocytes at 0, 1, 3, 6, and 24 hours recovery in vitro. 
 
-#Using pOverA data filtering method as used here: https://github.com/echille/Mcapitata_OA_Developmental_Gene_Expression_Timeseries/blob/main/4-Differential-Gene-Expression-Analysis/pHTreatment_RNAseqDE.Rmd
+#pOverA data filtering method is exemplified here: https://github.com/echille/Mcapitata_OA_Developmental_Gene_Expression_Timeseries/blob/main/4-Differential-Gene-Expression-Analysis/pHTreatment_RNAseqDE.Rmd
 
-#Updated 12/12/25 RMK
+#Updated 2/26/26 RMK
 
 #Import necessary libraries
 library("tidyverse")
@@ -201,7 +201,7 @@ gvst2 <- vst(gdds2, blind=FALSE) #apply a variance stabilizing transformation to
 head(assay(gvst2), 3) #view transformed gene count data for the first three genes in the dataset.
 
 
-#NOTE: design ~group tells This tells DESeq2 to model gene expression based on the group variable, which has 10 levels:
+#NOTE: design ~group tells DESeq2 to model gene expression based on the group variable, which has 10 levels:
 # 
 # control_0hr
 # zap_0hr
@@ -214,7 +214,7 @@ head(assay(gvst2), 3) #view transformed gene count data for the first three gene
 # control_24hr
 # zap_24hr
 # 
-# This is a categorical variable with 8 levels, so DESeq2 will treat one of them as the reference level (usually the first alphabetically or the first factor level), and compare all others to it.
+# This is a categorical variable with multiple levels, so DESeq2 will treat one of them as the reference level (usually the first alphabetically or the first factor level), and compare all others to it.
 # 
 # DESeq2 by default compares the first non-reference level to the reference level of your group factor. For example, if control_0hr is the reference, then:
 #   
@@ -244,7 +244,7 @@ head(normalized_counts)
 
 
 
-#Run DESeq and Extract results. Note that you have to explicitly call what timepoints you are comparing. If you dont, it will just compare the first "group" to the second one.
+#Run DESeq and Extract results. Note that you have to explicitly call what timepoints you are comparing. If you dont, it will just compare the first "group" to the second one. See note above.
 
 # Load required libraries
 library(dplyr)
@@ -346,7 +346,6 @@ plotDists = function (VST_DEG2.obj) {
                      col = colors)
 }
 plotDists(VST_DEG2)
-#looks good-- zaps cluster with each other, controls cluster with each other, looks like 0hr 1hr and 3hr are more similar than 6hr and 24hr
 
 
 #PCA plot using VST_DEG2 values
@@ -495,7 +494,7 @@ nb <- NbClust(mat_DEG2, distance = "euclidean", min.nc = 2,
 
 
 ### Get and save clustering results with DESeq2 results matrix "combined_filtered"
-#NOTE: it suggested 3 k means clusters, but this resulted in cluster2 having only 61 genes, highlighting Zap_3hr_B nothing else. Therefore using 2 clusters only.
+#NOTE: it suggested 3 k means clusters, but this resulted in cluster2 having only 61 genes. Therefore using 2 clusters only.
 calc_kmeans <- kmeans(mat_DEG2_centered, 2)
 head(calc_kmeans)
 
@@ -685,7 +684,7 @@ Cluster2_unmatched_ids <- Cluster2_loc_ids[!Cluster2_loc_ids %in% names(protein_
 print(Cluster2_unmatched_ids) #many
 
 #Input the unmatched IDs to echinobase, try to find protein sequence, add it to the reference protein FASTA. Run matching/protein seq pull again.
-#Confirmed that many unmatched LOC IDs hit to noncoding, pseudo, or ribosomal RNA (so no protein seq).
+#Confirmed that many unmatched LOC IDs hit to noncoding or pseudo RNA (so no protein seq).
 
 #Save the matched sequences to a new FASTA file
 writeXStringSet(Cluster2_matched_sequences, "Cluster2_proteinFASTA.fasta")
@@ -751,12 +750,12 @@ print(GOcluster1_expmeans.plot)
 
 
 
-#Statistics on the above (replace cluster # for 1,2)
+#Statistics on the above
 
 aov <-aov(count ~ time_point*treatment, data=GOcluster1_samplemeans)
 summary(aov)
 
-#Copy paste output to excel sheet to save
+#Copy pasted output to excel sheet to save
 
 # Perform Tukey's HSD test
 tukey_result <- TukeyHSD(aov)
@@ -819,6 +818,232 @@ print(tukey_table2)
 
 ggsave(filename="GOcluster2_expmeans.jpeg", 
        plot=GOcluster2_expmeans.plot, dpi=300, width=5.5, height=4.5, units="in")
+
+
+####### Identify the top 100 genes in both clusters using a centroid approach. Centroid is the av. expression of all genes in that cluster. Genes most representative of the cluster have expression profiles over time that match the cluster's overall pattern.
+
+# Use centered, VST matrix
+mat <- mat_DEG2_centered
+
+# Get cluster info into mat
+cluster_vector <- calc_kmeans$cluster
+names(cluster_vector) <- rownames(mat)
+
+# Get top genes defined by best Pearson correlation to cluster centroid
+get_top_genes <- function(cluster_number, n = 10) {
+  genes_in_cluster <- names(cluster_vector[cluster_vector == cluster_number])
+  cluster_mat <- mat[genes_in_cluster, ]
+  
+  # Compute centroid (mean expression profile)
+  centroid <- colMeans(cluster_mat)
+  
+  # Compute correlation of each gene to centroid
+  cors <- apply(cluster_mat, 1, function(x)
+    cor(x, centroid)) #Note: cor() function finds Pearson correlation between value X and the centroid. Pearson is used by default, if you dont specify.
+  cors_sorted <- sort(cors, decreasing = TRUE)[1:n]
+
+  # Get dataframe of top genes
+  top_genes <- data.frame(
+    gene = names(cors_sorted),
+    correlation_to_centroid = as.numeric(cors_sorted),
+    cluster = paste0("Cluster", cluster_number),
+    row.names = NULL
+  )
+  
+  return(top_genes)
+}
+
+top10_cluster1 <- get_top_genes(1, 10)
+top10_cluster2 <- get_top_genes(2, 10)
+
+top10_cluster1
+top10_cluster2
+
+top100_cluster1 <- get_top_genes(1, 100)
+top100_cluster2 <- get_top_genes(2, 100)
+
+top100_cluster1
+top100_cluster2
+
+
+# Combine top 10 genes into a data frame
+top_genes_df <- rbind(top10_cluster1, top10_cluster2)
+
+# Combine top 100 genes into a data frame
+top_100genes_df <- rbind(top100_cluster1, top100_cluster2)
+
+# Save to Excel file
+write_xlsx(top_genes_df, "Top10_genes_per_cluster.xlsx")
+write_xlsx(top_100genes_df, "Top100_genes_per_cluster.xlsx")
+
+######## Create line plots of top 10 genes each cluster #########
+
+#All gene names are LOC IDs. Map them to more informative short gene names. These were looked up manually and added to dictionary below.
+gene_map1 <- data.frame(
+  short_name = c(
+    "RPL18",
+    "RPS14",
+    "RPL28",
+    "L26",
+    "RWDD4",
+    "RPL7",
+    "RPS18",
+    "RPS24",
+    "RPL23a",
+    "RPS25",
+    "DDX17",
+    "ARF16",
+    "TSPAN4",
+    "NACA",
+    "AGO1",
+    "STK17A",
+    "Unchar.",
+    "ITIH3",
+    "JNK",
+    "LLGL2"
+  ),
+  gene = c(
+    "LOC373246",
+    "rps14",
+    "LOC754209",
+    "LOC585872",
+    "LOC100893494",
+    "LOC755731",
+    "LOC105436394",
+    "LOC592738",
+    "LOC588157",
+    "LOC589961",
+    "LOC578813",
+    "LOC115918858",
+    "LOC593238",
+    "LOC100889842",
+    "ago1",
+    "LOC582485",
+    "LOC100889516",
+    "LOC584806",
+    "LOC580919",
+    "LOC578619"
+  ),
+  stringsAsFactors = FALSE
+)
+
+#Combine top10 genes into 1 list
+top_genes_all <- c(top10_cluster1, top10_cluster2)
+
+#Extract expression data
+top_gene_exp <- GOcluster_exp %>%
+  filter(gene %in% top_genes_all)
+
+#Order by timepoint
+top_gene_exp$time_point <- factor(top_gene_exp$time_point,
+                                  levels = c("0hr","1hr","3hr","6hr","24hr"))
+# Summarize mean +/- SE
+top_gene_summary <- top_gene_exp %>%
+  group_by(gene, treatment, time_point) %>%
+  dplyr::summarise(
+    mean_expr = mean(count),
+    se = sd(count)/sqrt(length(count)),
+    .groups = "drop"
+  )
+
+#For plotting, want all cluster 1 genes to appear first, therefore order plot facets by cluster
+gene_order <- c(top10_cluster1, top10_cluster2)
+
+top_gene_summary$gene <- factor(top_gene_summary$gene,
+                                levels = gene_order)
+
+#PLOT
+top_gene_plot <- ggplot(top_gene_summary,
+                        aes(x=time_point,
+                            y=mean_expr,
+                            color=treatment,
+                            group=treatment)) +
+  geom_line(size=0.8) +
+  geom_point(size=2) +
+  geom_errorbar(aes(ymin=mean_expr-se,
+                    ymax=mean_expr+se),
+                width=0.1) +
+  facet_wrap(~gene, scales="free_y", ncol=5) +
+  theme_bw() +
+  scale_color_manual(values = c("#006bff", "#ff0000")) +
+  labs(title="Top 10 Key Genes per Cluster",
+       y="VST expression",
+       x="Time point")
+
+print(top_gene_plot)
+#Plot is correctly ordered, but need to have short gene names rather than LOC ID
+
+#Merge top_gene_sumary to add short gene names
+top_gene_summary <- top_gene_summary %>%
+  left_join(gene_map1, by = c("gene" = "gene"))
+
+#Check merge
+if(!"short_name" %in% colnames(top_gene_summary)){
+  stop("Merge failed: short_name not found.")
+}
+
+# Get short names in same order as gene_order
+gene_order_short <- gene_map1$short_name[
+  match(gene_order, gene_map1$gene)
+]
+
+top_gene_summary$gene_label <- factor(
+  top_gene_summary$short_name,
+  levels = gene_order_short
+)
+
+#PLOT, now showing short gene names rather than LOC ID
+top_gene_plot <- ggplot(top_gene_summary,
+                        aes(x=time_point,
+                            y=mean_expr,
+                            color=treatment,
+                            group=treatment)) +
+  geom_line(size=0.8) +
+  geom_point(size=2) +
+  geom_errorbar(aes(ymin=mean_expr-se,
+                    ymax=mean_expr+se),
+                width=0.1) +
+  facet_wrap(~gene_label, scales="free_y", ncol=5) +
+  theme_bw() +
+  scale_color_manual(values = c("#006bff", "#ff0000")) +
+  labs(title="Top 10 Key Genes per Cluster",
+       y="VST expression",
+       x="Time point")
+
+print(top_gene_plot)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ##Old lookup table is not complete, need to update it using the GTF file (BCF_000002235.5_Spur_5.0_genomic.gtf, from NCBI) by pulling gene_id, db_xref, and product
@@ -898,6 +1123,7 @@ write.csv(DEG2_list_with_clusters_genedescriptions, file="DEG2_list_annotated.cs
 
 
 #DEG2_list <- read.csv("DEG2_list.csv") #to read back in
+
 
 
 
