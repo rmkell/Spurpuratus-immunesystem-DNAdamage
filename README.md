@@ -1,6 +1,8 @@
 # Transcriptomic analysis of purple sea urchin (*Strongylocentrotus purpuratus*) immune cells (coelomocytes) challenged with UVB radiation (10,000 mJ/cm2) to induce DNA damage
 Raw data for the single-cell and bulk RNA sequencing have been deposited in the National Center of Biotechnology Information (NCBI) under BioProject accession number PRJNA1346447 (Sequence Read Archive accession numbers SRR35853817 – SRR35853834). 
 
+Processed scRNAseq H5AD files are available on Zenodo: 10.5281/zenodo.23371717
+
 # Single-cell RNA sequencing #
 * Single-cell RNA sequencing was performed on *S. purpuratus* coelomocytes harvested at 6hrs post-UVB dose.
 * 10,000 cells from n=3 biological replicates were prepared with the 10x Genomic Chromium Next GEM Single Cell 3' v3.1 protocol following the manufacturer’s instructions.
